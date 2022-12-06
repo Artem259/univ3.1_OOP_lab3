@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Application</string>
+    <string name="app_logo">Lines</string>
+    <string name="score_textView">Score:</string>
+    <string name="score_number_textView">0</string>
+    <string name="high_score_textView">High score:</string>
+    <string name="high_score_number_textView">0</string>
+    <string name="reset_button">Reset</string>
+</resources>
