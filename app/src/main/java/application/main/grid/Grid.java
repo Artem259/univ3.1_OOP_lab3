@@ -3,7 +3,6 @@ package application.main.grid;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 
 import application.main.common.Coord;
 
@@ -11,12 +10,16 @@ public class Grid {
     private final int[][] field;
     private final int rows;
     private final int columns;
-    private static final int EMPTY_VALUE = 0;
+    private final int emptyValue = 0;
 
     public Grid(int rows, int columns) {
         this.field = new int[rows][columns];
         this.rows = rows;
         this.columns = columns;
+    }
+
+    public int getEmptyValue() {
+        return emptyValue;
     }
 
     public int getRows() {
@@ -36,7 +39,7 @@ public class Grid {
     }
 
     public boolean isEmptyAt(Coord coord) {
-        return (field[coord.row()][coord.col()] == EMPTY_VALUE);
+        return (field[coord.row()][coord.col()] == emptyValue);
     }
 
     public ArrayList<Coord> allNeighboursOf(Coord coord) {
@@ -56,14 +59,8 @@ public class Grid {
         res.add(new Coord(row+1, col-1));
         res.add(new Coord(row, col-1));
 
-        Iterator<Coord> iterator = res.iterator();
-        while (iterator.hasNext()) {
-            Coord neighbour = iterator.next();
-            if ((neighbour.row() < 0 || neighbour.row() > rows-1)
-                    || (neighbour.col() < 0 || neighbour.col() > columns-1)) {
-                iterator.remove();
-            }
-        }
+        res.removeIf(neighbour -> (neighbour.row() < 0 || neighbour.row() > rows - 1)
+                || (neighbour.col() < 0 || neighbour.col() > columns - 1));
 
         return res;
     }
@@ -73,20 +70,13 @@ public class Grid {
         int col = coord.col();
         ArrayList<Coord> res = allNeighboursOf(coord);
 
-        Iterator<Coord> iterator = res.iterator();
-        while (iterator.hasNext()) {
-            Coord neighbour = iterator.next();
-            if (neighbour.row() != row && neighbour.col() != col) {
-                iterator.remove();
-            }
-        }
+        res.removeIf(neighbour -> (neighbour.row() != row && neighbour.col() != col));
 
         return res;
     }
 
     public ArrayList<Coord> pathFindingByRelated(Coord start, Coord finish) {
-        if (field[start.row()][start.col()] != EMPTY_VALUE
-                || field[finish.row()][finish.col()] != EMPTY_VALUE) {
+        if (field[finish.row()][finish.col()] != emptyValue) {
             throw new IllegalArgumentException();
         }
         Coord[][] parents = new Coord[rows][columns];
@@ -104,7 +94,7 @@ public class Grid {
             ArrayList<Coord> neighbours = relatedNeighboursTo(cell);
 
             for (Coord neighbour : neighbours) {
-                if (field[neighbour.row()][neighbour.col()] == EMPTY_VALUE
+                if (field[neighbour.row()][neighbour.col()] == emptyValue
                         && parents[neighbour.row()][neighbour.col()] == null) {
                     parents[neighbour.row()][neighbour.col()] = new Coord(cell);
                     queue.add(neighbour);
@@ -122,6 +112,52 @@ public class Grid {
         res.add(start);
 
         Collections.reverse(res);
+        return res;
+    }
+
+    public ArrayList<Coord> setCellAtDestroy(Coord coord, int v) {
+        final int inRow = 5;
+        field[coord.row()][coord.col()] = v;
+        int rowV, colV;
+        ArrayList<Coord> res = new ArrayList<>();
+
+        for (int caseI=0; caseI<4; caseI++) {
+            switch (caseI) {
+                case 0: rowV = 0; colV = -1; break;
+                case 1: rowV = -1; colV = -1; break;
+                case 2: rowV = -1; colV = 0; break;
+                case 3: rowV = -1; colV = 1; break;
+                default: throw new RuntimeException();
+            }
+
+            int row = coord.row() + rowV;
+            int col = coord.col() + colV;
+            ArrayList<Coord> currentRes = new ArrayList<>();
+            for (int i=0; i<2; i++) {
+                while (row >=0 && row < rows && col >=0 && col < columns && field[coord.row()][coord.col()] == field[row][col]
+                        && field[row][col] != emptyValue) {
+                    if (!coord.equals(new Coord(row, col))) {
+                        currentRes.add(new Coord(row, col));
+                    }
+                    row += rowV;
+                    col += colV;
+                }
+                rowV *= -1;
+                colV *= -1;
+                row = coord.row() + rowV;
+                col = coord.col() + colV;
+            }
+
+            if (currentRes.size() >= inRow-1) {
+                res.addAll(currentRes);
+            }
+        }
+        if (!res.isEmpty()) {
+            res.add(coord);
+            for (Coord c : res) {
+                field[c.row()][c.col()] = emptyValue;
+            }
+        }
         return res;
     }
 }

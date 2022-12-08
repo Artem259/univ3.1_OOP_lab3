@@ -7,5 +7,17 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="grid_background">#505050</color>
+    <color name="grid_background">#202020</color>
+    <color name="selected_cell">#505050</color>
+    <color name="game_over_cell">#cccccc</color>
+    <color name="no_path_error">#ff0000</color>
+
+
+    <color name="ball_1">#FF5733</color>
+    <color name="ball_2">#3F48CC</color>
+    <color name="ball_3">#FFF200</color>
+    <color name="ball_4">#A349A4</color>
+    <color name="ball_5">#22B14C</color>
+    <color name="ball_6">#880015</color>
+    <color name="ball_7">#804000</color>
 </resources>
